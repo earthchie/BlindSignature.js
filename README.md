@@ -22,9 +22,9 @@ This is the client side implementation of https://github.com/kevinejohn/blind-si
 1. Signer prepare keypair, then give `publicKeyPem` to Author.
 
 ```javascript
-const k = forge.pki.rsa.generateKeyPair();
-const publicKeyPem = forge.pki.publicKeyToPem(k.publicKey);
-const privateKeyPem = forge.pki.privateKeyToPem(k.privateKey);
+const keypair = forge.pki.rsa.generateKeyPair(2048);
+const publicKeyPem = forge.pki.publicKeyToPem(keypair.publicKey);
+const privateKeyPem = forge.pki.privateKeyToPem(keypair.privateKey);
 ```
 
 2. Author prepare blinded ballot. Send `blinded` to Signer.
