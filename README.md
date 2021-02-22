@@ -61,7 +61,7 @@ Author can also verify signature if needed.
 const verify_result = await Author.verify();
 ```
 
-5. Signer can verify unblined ballot too.
+5. Signer verify signature compare with original message that they've never seen.
 
 ```javascript
 const verify_result2 = await Signer.verify(ballot.signature, ballot.body)
