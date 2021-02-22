@@ -1,5 +1,5 @@
 # BlindSignature.js
-Make anonymouse vote possible!
+Make anonymous vote possible!
 
 This is the client side implementation of https://github.com/kevinejohn/blind-signatures/blob/master/rsablind.js.
 
