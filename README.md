@@ -35,7 +35,8 @@ const vote = JSON.stringify({
     wallet_address: '0x000000...00000', // ethereum address, for example
     vote: 1
 });
-const blinded = await Author.blind(vote);
+const blinded = Author.blind(vote);
+console.log(blinnded);
 ```
 
 3. Signer sign blinded-ballot. Send `signed` back to Author.
@@ -43,6 +44,7 @@ const blinded = await Author.blind(vote);
 ```javascript
 const Signer = new BlindSignature.signer(privateKeyPem);
 const signed = Signer.sign(blinded);
+console.log(signed);
 ```
 
 4. Author unblind ballot. Then create an actual ballot. Send `ballot` to Taller over the anonymous channel. For example: Ethereum Network with anonymous wallet.
@@ -53,18 +55,21 @@ const ballot = {
     body: vote,
     signature: unblinded
 };
+console.log(ballot);
 ```
 
 Author can also verify signature if needed.
 
 ```javascript
-const verify_result = await Author.verify();
+const verify_result = Author.verify();
+console.log(verify_result);
 ```
 
 5. Signer verify signature compare with original message that they've never seen.
 
 ```javascript
-const verify_result2 = await Signer.verify(ballot.signature, ballot.body)
+const verify_result2 = Signer.verify(ballot.signature, ballot.body);
+console.log(verify_result2);
 ```
 
 # License
