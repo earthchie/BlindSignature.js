@@ -1,9 +1,9 @@
 /**
  * @name BlindSignature.js
- * @version 1.0.0
- * @update Feb 22, 2021
+ * @version 1.0.1
+ * @update Feb 25, 2021
  * @license MIT License
- * @credits All credit to @kevinejohn. This is the browser version of https://github.com/kevinejohn/blind-signatures/blob/master/rsablind.js
+ * @credits All credits to @kevinejohn. This is the browser version of https://github.com/kevinejohn/blind-signatures/blob/master/rsablind.js
  *
  * @dependencies forge.js <https://github.com/digitalbazaar/forge>
  **/
@@ -12,7 +12,6 @@ const BlindSignature = {
 
     /**
      * @name sign
-     * @async no
      * @description sign blinded message
      * @input
      * +--------------------+----------+----------------+----------------------------------------+
@@ -38,7 +37,6 @@ const BlindSignature = {
 
     /**
      * @name blind
-     * @async yes
      * @description blinded message
      * @input
      * +--------------------+----------+----------------+----------------------------------------+
@@ -58,9 +56,9 @@ const BlindSignature = {
      * |    blind_factor    |   BigInteger   | blind factor for unblind later         |
      * +--------------------+----------------+----------------------------------------+
      **/
-    blind: async function(message, publicKey) {
+    blind: function(message, publicKey) {
 
-        const messageHash = await this.sha256BigInt(message);
+        const messageHash = this.sha256BigInt(message);
         const N = new forge.jsbn.BigInteger(publicKey.n.toString());
         const E = new forge.jsbn.BigInteger(publicKey.e.toString());
         const One = new forge.jsbn.BigInteger('1');
@@ -82,7 +80,6 @@ const BlindSignature = {
 
     /**
      * @name unblind
-     * @async no
      * @description unblind blind-signed message
      * @input
      * +-----------------------+----------+----------------+----------------------------------------+
@@ -111,7 +108,6 @@ const BlindSignature = {
 
     /**
      * @name verifyWithPublicKey
-     * @async yes
      * @description verify unblinded message with public key
      * @input
      * +-----------------------+----------+----------------+----------------------------------------+
@@ -131,9 +127,9 @@ const BlindSignature = {
      * |         result        |    Boolean     | verification result                    |
      * +-----------------------+----------------+----------------------------------------+
      **/
-    verifyWithPublicKey: async function(unblinded, publicKey, message) {
+    verifyWithPublicKey: function(unblinded, publicKey, message) {
 
-        const messageHash = await this.sha256BigInt(message);
+        const messageHash = this.sha256BigInt(message);
         const E = new forge.jsbn.BigInteger(publicKey.e.toString());
         const N = new forge.jsbn.BigInteger(publicKey.n.toString());
 
@@ -142,7 +138,6 @@ const BlindSignature = {
 
     /**
      * @name verifyWithPrivateKey
-     * @async yes
      * @description verify unblinded message with private key
      * @input
      * +-----------------------+----------+----------------+----------------------------------------+
@@ -162,9 +157,9 @@ const BlindSignature = {
      * |         result        |    Boolean     | verification result                    |
      * +-----------------------+----------------+----------------------------------------+
      **/
-    verifyWithPrivateKey: async function(unblinded, privateKey, message) {
+    verifyWithPrivateKey: function(unblinded, privateKey, message) {
 
-        const messageHash = await this.sha256BigInt(message);
+        const messageHash = this.sha256BigInt(message);
         const D = new forge.jsbn.BigInteger(privateKey.d.toString());
         const N = new forge.jsbn.BigInteger(privateKey.n.toString());
 
@@ -173,7 +168,6 @@ const BlindSignature = {
 
     /**
      * @name verifyWithPrivateKey (static)
-     * @async yes
      * @description verify unblinded message with private key
      * @input
      * +-----------------------+----------+----------------+----------------------------------------+
@@ -193,14 +187,12 @@ const BlindSignature = {
      * |         result        |    Boolean     | verification result                    |
      * +-----------------------+----------------+----------------------------------------+
      **/
-    sha256BigInt: async function(message) {
+    sha256BigInt: function(message) {
 
-        const msgBuffer = new TextEncoder().encode(message);
-        const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-        const hashArray = Array.from(new Uint8Array(hashBuffer));
-        const hashHex = hashArray.map(b => ('00' + b.toString(16)).slice(-2)).join('');
+        let md = forge.md.sha256.create();
+        md.update(message);
 
-        return new forge.jsbn.BigInteger(hashHex, 16);
+        return new forge.jsbn.BigInteger(md.digest().toHex(), 16);
 
     },
 }
@@ -209,7 +201,6 @@ BlindSignature.author = class {
 
     /**
      * @name constructor
-     * @async no
      * @description construct object for author
      * @input
      * +-----------------------+----------+----------------+----------------------------------------+
@@ -224,7 +215,6 @@ BlindSignature.author = class {
 
     /**
      * @name blind
-     * @async yes
      * @description blind the message
      * @input
      * +-----------------------+----------+----------------+----------------------------------------+
@@ -240,15 +230,14 @@ BlindSignature.author = class {
      * |        blinded        |     String     | base36 blinded message                 |
      * +-----------------------+----------------+----------------------------------------+
      **/
-    async blind(message) {
+    blind(message) {
         this.message = message;
-        this.blinded = await BlindSignature.blind(this.message, this.publicKey);
+        this.blinded = BlindSignature.blind(this.message, this.publicKey);
         return this.blinded.blinded_message.toString(36);
     }
 
     /**
      * @name unblind
-     * @async no
      * @description unblind the blind-signed message
      * @input
      * +-----------------------+----------+----------------+----------------------------------------+
@@ -271,7 +260,6 @@ BlindSignature.author = class {
 
     /**
      * @name verify
-     * @async yes
      * @description verify after the message has been unblinded
      * 
      * @output
@@ -281,8 +269,8 @@ BlindSignature.author = class {
      * |        result         |     Boolean    | verification result                    |
      * +-----------------------+----------------+----------------------------------------+
      **/
-    async verify() {
-        return await BlindSignature.verifyWithPublicKey(this.unblinded, this.publicKey, this.message);
+    verify() {
+        return BlindSignature.verifyWithPublicKey(this.unblinded, this.publicKey, this.message);
     }
     
 }
@@ -291,7 +279,6 @@ BlindSignature.signer = class {
 
     /**
      * @name constructor
-     * @async no
      * @description construct object for signer
      * @input
      * +-----------------------+----------+----------------+----------------------------------------+
@@ -306,7 +293,6 @@ BlindSignature.signer = class {
 
     /**
      * @name sign
-     * @async no
      * @description sign the blinded message
      * @input
      * +-----------------------+----------+----------------+----------------------------------------+
@@ -328,7 +314,6 @@ BlindSignature.signer = class {
 
     /**
      * @name verify
-     * @async yes
      * @description verify the blind signature
      * @input
      * +-----------------------+----------+----------------+----------------------------------------+
@@ -346,7 +331,7 @@ BlindSignature.signer = class {
      * |        result         |     Boolean    | verification result                    |
      * +-----------------------+----------------+----------------------------------------+
      **/
-    async verify(unblinded, message) {
-        return await BlindSignature.verifyWithPrivateKey(new forge.jsbn.BigInteger(unblinded, 36), this.privateKey, message);
+    verify(unblinded, message) {
+        return BlindSignature.verifyWithPrivateKey(new forge.jsbn.BigInteger(unblinded, 36), this.privateKey, message);
     }
 }
