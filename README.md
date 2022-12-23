@@ -36,7 +36,7 @@ const vote = JSON.stringify({
     vote: 1
 });
 const blinded = Author.blind(vote);
-console.log(blinnded);
+console.log(blinded);
 ```
 
 3. Signer sign blinded-ballot. Send `signed` back to Author.
@@ -50,10 +50,10 @@ console.log(signed);
 4. Author unblind ballot. Then create an actual ballot. Send `ballot` to Taller over the anonymous channel. For example: Ethereum Network with anonymous wallet.
 
 ```javascript
-const unblinded = Author.unblind(signed);
+const signature = Author.unblind(signed);
 const ballot = {
     body: vote,
-    signature: unblinded
+    signature: signature
 };
 console.log(ballot);
 ```
@@ -70,6 +70,14 @@ console.log(verify_result);
 ```javascript
 const verify_result2 = Signer.verify(ballot.signature, ballot.body);
 console.log(verify_result2);
+```
+
+6. If you are dealing with DomeCloud's e-election (smart contract)[https://gist.github.com/earthchie/68c5fdb86c41f1fe691a64f2d7314b9d]. You'll need these variables:
+
+```
+const N_factor = Signer.N_factor();
+const ballotBody = BlindSignature.ascii2hex(vote);
+const ballotSignature = signature; // from step #4 -> Author.unblind(signed)
 ```
 
 # License
