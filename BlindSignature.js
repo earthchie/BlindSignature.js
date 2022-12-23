@@ -1,7 +1,7 @@
 /**
  * @name BlindSignature.js
  * @version 2.0.0
- * @update Feb 25, 2021
+ * @update Dec 23, 2022
  * @license MIT License
  * @credits All credits to @kevinejohn. This is the browser version of https://github.com/kevinejohn/blind-signatures/blob/master/rsablind.js
  *
