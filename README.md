@@ -72,13 +72,15 @@ const verify_result2 = Signer.verify(ballot.signature, ballot.body);
 console.log(verify_result2);
 ```
 
-6. If you are dealing with DomeCloud's e-election (smart contract)[https://gist.github.com/earthchie/68c5fdb86c41f1fe691a64f2d7314b9d]. You'll need these variables:
+6. If you are dealing with DomeCloud's e-election [smart contract](https://gist.github.com/earthchie/68c5fdb86c41f1fe691a64f2d7314b9d). You'll need these variables:
 
 ```
 const N_factor = Signer.N_factor();
 const ballotBody = BlindSignature.ascii2hex(vote);
 const ballotSignature = signature; // from step #4 -> Author.unblind(signed)
 ```
+
+Also to make the vote anonymous. Voter must create new wallet every time, submit it to smart contract using EIP-2771. With EIP-2771 voter do not need to pay transaction gas, so no way to track down the origin of the gas and identity of the voter.
 
 # License
 MIT
