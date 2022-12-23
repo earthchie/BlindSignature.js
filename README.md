@@ -80,7 +80,7 @@ const ballotBody = BlindSignature.ascii2hex(vote);
 const ballotSignature = signature; // from step #4 -> Author.unblind(signed)
 ```
 
-Also to make the vote anonymous. Voter must create a new wallet every time, submit the ballot to smart contract using EIP-2771. With EIP-2771 voter do not need to pay transaction gas, so no way to track down the origin of the gas, so identity of the voter.
+Also to make the vote anonymous. Voter must create a new wallet every time, submit the ballot to smart contract using EIP-2771. With EIP-2771 voter do not need to pay transaction gas, so no way to track down the origin of the gas, also identity of the voter.
 
 # License
 MIT
