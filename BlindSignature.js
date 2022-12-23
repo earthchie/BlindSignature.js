@@ -1,6 +1,6 @@
 /**
  * @name BlindSignature.js
- * @version 1.0.1
+ * @version 2.0.0
  * @update Feb 25, 2021
  * @license MIT License
  * @credits All credits to @kevinejohn. This is the browser version of https://github.com/kevinejohn/blind-signatures/blob/master/rsablind.js
@@ -195,6 +195,36 @@ const BlindSignature = {
         return new forge.jsbn.BigInteger(md.digest().toHex(), 16);
 
     },
+
+    /**
+     * @name ascii2hex (static)
+     * @description convert string to hex. Useful for converting message before submiting to the smart contract.
+     * @input
+     * +-----------------------+----------+----------------+----------------------------------------+
+     * |          name         | required |      type      |               description              |
+     * +-----------------------+----------+----------------+----------------------------------------+
+     * |       unblinded       |   true   |   BigInteger   | unblinded message to verify            |
+     * +-----------------------+----------+----------------+----------------------------------------+
+     * |       privateKey      |   true   |  forge Object  | forge object of private key            |
+     * +-----------------------+----------+----------------+----------------------------------------+
+     * |        message        |   true   |     String     | original message                       |
+     * +-----------------------+----------+----------------+----------------------------------------+
+     *
+     * @output
+     * +-----------------------+----------------+----------------------------------------+
+     * |         name          |      type      |               description              |
+     * +-----------------------+----------------+----------------------------------------+
+     * |         result        |    Boolean     | verification result                    |
+     * +-----------------------+----------------+----------------------------------------+
+     **/
+    ascii2hex: function(str){
+        let arr1 = [];
+        for (let n = 0, l = str.length; n < l; n++) {
+            let hex = Number(str.charCodeAt(n)).toString(16);
+            arr1.push(hex);
+        }
+        return '0x'+arr1.join('');
+    }
 }
 
 BlindSignature.author = class {
@@ -227,13 +257,13 @@ BlindSignature.author = class {
      * +-----------------------+----------------+----------------------------------------+
      * |         name          |      type      |               description              |
      * +-----------------------+----------------+----------------------------------------+
-     * |        blinded        |     String     | base36 blinded message                 |
+     * |        blinded        |     String     | base16 blinded message                 |
      * +-----------------------+----------------+----------------------------------------+
      **/
     blind(message) {
         this.message = message;
         this.blinded = BlindSignature.blind(this.message, this.publicKey);
-        return this.blinded.blinded_message.toString(36);
+        return '0x'+this.blinded.blinded_message.toString(16);
     }
 
     /**
@@ -243,19 +273,19 @@ BlindSignature.author = class {
      * +-----------------------+----------+----------------+----------------------------------------+
      * |          name         | required |      type      |               description              |
      * +-----------------------+----------+----------------+----------------------------------------+
-     * |         signed        |   true   |     String     | base36 blind-signed message            |
+     * |         signed        |   true   |     String     | base16 blind-signature                 |
      * +-----------------------+----------+----------------+----------------------------------------+
      *
      * @output
      * +-----------------------+----------------+----------------------------------------+
      * |         name          |      type      |               description              |
      * +-----------------------+----------------+----------------------------------------+
-     * |       unblinded       |     String     | base36 unblinded message               |
+     * |       signature       |     String     | base16 unblinded signature             |
      * +-----------------------+----------------+----------------------------------------+
      **/
     unblind (signed) {
-        this.unblinded = BlindSignature.unblind(new forge.jsbn.BigInteger(signed, 36), this.blinded.blind_factor, this.publicKey);
-        return this.unblinded.toString(36);
+        this.unblinded = BlindSignature.unblind(new forge.jsbn.BigInteger(signed.replace('0x',''), 16), this.blinded.blind_factor, this.publicKey);
+        return '0x'+this.unblinded.toString(16);
     }
 
     /**
@@ -292,24 +322,41 @@ BlindSignature.signer = class {
     }
 
     /**
+     * @name N_factor
+     * @description get the N_factor of signer which required to blind the message
+     * @input
+     * none
+     *
+     * @output
+     * +-----------------------+----------------+----------------------------------------+
+     * |         name          |      type      |               description              |
+     * +-----------------------+----------------+----------------------------------------+
+     * |       N_factor        |     String     | base16 of n factor                     |
+     * +-----------------------+----------------+----------------------------------------+
+     **/
+    N_factor(){
+        return '0x'+this.privateKey.n.toString(16);
+    }
+
+    /**
      * @name sign
      * @description sign the blinded message
      * @input
      * +-----------------------+----------+----------------+----------------------------------------+
      * |          name         | required |      type      |               description              |
      * +-----------------------+----------+----------------+----------------------------------------+
-     * |        blinded        |   true   |     String     | base36 blinded message                 |
+     * |        blinded        |   true   |     String     | base16 blinded message                 |
      * +-----------------------+----------+----------------+----------------------------------------+
      *
      * @output
      * +-----------------------+----------------+----------------------------------------+
      * |         name          |      type      |               description              |
      * +-----------------------+----------------+----------------------------------------+
-     * |        signed         |     String     | base36 signed message                  |
+     * |        signed         |     String     | base16 signed message                  |
      * +-----------------------+----------------+----------------------------------------+
      **/
     sign(blinded) {
-        return BlindSignature.sign(new forge.jsbn.BigInteger(blinded, 36), this.privateKey).toString(36);
+        return '0x'+BlindSignature.sign(new forge.jsbn.BigInteger(blinded.replace('0x',''), 16), this.privateKey).toString(16);
     }
 
     /**
@@ -319,7 +366,7 @@ BlindSignature.signer = class {
      * +-----------------------+----------+----------------+----------------------------------------+
      * |          name         | required |      type      |               description              |
      * +-----------------------+----------+----------------+----------------------------------------+
-     * |       unblinded       |   true   |     String     | base36 unblinded message               |
+     * |       unblinded       |   true   |     String     | base16 unblinded message               |
      * +-----------------------+----------+----------------+----------------------------------------+
      * |        message        |   true   |     String     | original message                       |
      * +-----------------------+----------+----------------+----------------------------------------+
@@ -332,6 +379,6 @@ BlindSignature.signer = class {
      * +-----------------------+----------------+----------------------------------------+
      **/
     verify(unblinded, message) {
-        return BlindSignature.verifyWithPrivateKey(new forge.jsbn.BigInteger(unblinded, 36), this.privateKey, message);
+        return BlindSignature.verifyWithPrivateKey(new forge.jsbn.BigInteger(unblinded.replace('0x',''), 16), this.privateKey, message);
     }
 }
