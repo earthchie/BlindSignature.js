@@ -27,23 +27,23 @@ const publicKeyPem = forge.pki.publicKeyToPem(keypair.publicKey);
 const privateKeyPem = forge.pki.privateKeyToPem(keypair.privateKey);
 ```
 
-2. The Author prepares a blinded ballot. Then send `blinded` to Signer.
+2. The Author prepares a blinded ballot. Then send `blindedMessage` to Signer.
 
 ```javascript
 const Author = new BlindSignature.author(publicKeyPem);
-const vote = JSON.stringify({
-    wallet_address: '0x000000...00000', // ethereum address, for example
+const message = JSON.stringify({
+    wallet_address: '0x000000...00000', // Ethereum address, for example
     vote: 1
 });
-const blinded = Author.blind(vote);
-console.log(blinded);
+const blindedMessage = Author.blind(message);
+console.log(blindedMessage);
 ```
 
 3. The Signer sign blinded-ballot. Send the `blindSignature` back to the Author.
 
 ```javascript
 const Signer = new BlindSignature.signer(privateKeyPem);
-const blindSignature = Signer.sign(blinded);
+const blindSignature = Signer.sign(blindedMessage);
 console.log(blindSignature);
 ```
 
@@ -52,7 +52,7 @@ console.log(blindSignature);
 ```javascript
 const finalSignature = Author.unblind(blindSignature);
 const ballot = {
-    body: vote,
+    body: message,
     signature: finalSignature
 };
 console.log(ballot);
@@ -69,7 +69,7 @@ or
 
 ```javascript
 const signatureBigInt = new forge.jsbn.BigInteger(finalSignature.replace('0x', ''), 16);
-const verifyResult = BlindSignature.verifyWithPublicKey(signatureBigInt, keypair.publicKey, vote);
+const verifyResult = BlindSignature.verifyWithPublicKey(signatureBigInt, keypair.publicKey, message);
 console.log(verifyResult);
 ```
 
@@ -84,7 +84,7 @@ or
 
 ```javascript
 const signatureBigInt = new forge.jsbn.BigInteger(finalSignature.replace('0x', ''), 16);
-const verifyResult2 = BlindSignature.verifyWithPrivateKey(signatureBigInt, keypair.privateKey, vote);
+const verifyResult2 = BlindSignature.verifyWithPrivateKey(signatureBigInt, keypair.privateKey, message);
 console.log(verifyResult2);
 ```
 
@@ -92,7 +92,7 @@ console.log(verifyResult2);
 
 ```
 const N_factor = Signer.N_factor();
-const ballotBody = BlindSignature.ascii2hex(vote);
+const ballotBody = BlindSignature.ascii2hex(message);
 const ballotSignature = finalSignature; // from step #4 -> Author.unblind(blindSignature)
 ```
 
