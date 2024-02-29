@@ -113,9 +113,9 @@ const verifyResult2 = BlindSignature.verifyWithPrivateKey(signatureBigInt, keypa
 console.log(verifyResult2);
 ```
 
-6. If you are dealing with DomeCloud's e-election [smart contract](https://gist.github.com/earthchie/68c5fdb86c41f1fe691a64f2d7314b9d). you'll need the following variables:
+6. If you are dealing with DomeCloud's e-election [smart contract](https://gist.github.com/earthchie/90efd4227b7b5e21c97ed03238f4d46b). you'll need the following variables:
 
-ถ้านำไปใช้งานร่วมกับ DomeCloud's e-election [smart contract](https://gist.github.com/earthchie/68c5fdb86c41f1fe691a64f2d7314b9d) จำเป็นต้องใช้ตัวแปรเหล่านี้ด้วย
+ถ้านำไปใช้งานร่วมกับ DomeCloud's e-election [smart contract](https://gist.github.com/earthchie/90efd4227b7b5e21c97ed03238f4d46b) ต้องใช้ตัวแปรเหล่านี้ด้วย
 
 ```
 const N_factor = Signer.N_factor();
